@@ -1,4 +1,5 @@
 import 'package:favorite_places_app/providers/places_list_provider.dart';
+import 'package:favorite_places_app/widgets/image_input.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 
@@ -16,6 +17,7 @@ class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
   String _title = '';
   @override
   Widget build(BuildContext context) {
+    // ignore: unused_local_variable
     final favPlaces = ref.watch(favoritePlacesProvider);
     return Scaffold(
       appBar: AppBar(
@@ -42,6 +44,10 @@ class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
               },
               onSaved: (value) => _title = value!,
             ),
+            const SizedBox(
+              height: 10,
+            ),
+            const ImageInput(),
             const SizedBox(
               height: 10,
             ),
