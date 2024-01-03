@@ -11,30 +11,38 @@ class PlacesListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final favPlaces = ref.watch(favoritePlacesProvider);
+
+    Widget content = favPlaces.isEmpty
+        ? Center(
+            child: Text(
+            "No places added yet",
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge!
+                .copyWith(color: Theme.of(context).colorScheme.onBackground),
+          ))
+        : ListView.builder(
+            itemCount: favPlaces.length,
+            itemBuilder: (context, index) {
+              return PlaceItem(place: favPlaces[index]);
+            });
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("Your places"),
-          actions: [
-            IconButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const AddPlaceScreen()));
-              },
-              icon: const Icon(Icons.add),
-            )
-          ],
-        ),
-        body: favPlaces.isEmpty
-            ? Center(
-                child: Text(
-                "No places added yet",
-                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground),
-              ))
-            : ListView.builder(
-                itemCount: favPlaces.length,
-                itemBuilder: (context, index) {
-                  return PlaceItem(place: favPlaces[index]);
-                }));
+      appBar: AppBar(
+        title: const Text("Your places"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const AddPlaceScreen()));
+            },
+            icon: const Icon(Icons.add),
+          )
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: content,
+      ),
+    );
   }
 }

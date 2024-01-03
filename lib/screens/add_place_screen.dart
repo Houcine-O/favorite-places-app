@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:favorite_places_app/providers/places_list_provider.dart';
 import 'package:favorite_places_app/widgets/image_input.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,6 +17,7 @@ class AddPlaceScreen extends ConsumerStatefulWidget {
 class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
   final _formKey = GlobalKey<FormState>();
   String _title = '';
+  File? _pickedImage;
   @override
   Widget build(BuildContext context) {
     // ignore: unused_local_variable
@@ -47,7 +50,9 @@ class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
             const SizedBox(
               height: 10,
             ),
-            const ImageInput(),
+            ImageInput(onPickImage: (image) {
+              _pickedImage = image;
+            }),
             const SizedBox(
               height: 10,
             ),
@@ -55,8 +60,10 @@ class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
+                  if (_pickedImage == null) return;
                   Place newPlace = Place(
                     title: _title,
+                    image: _pickedImage!,
                   );
                   ref
                       .read(favoritePlacesProvider.notifier)
