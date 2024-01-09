@@ -16,6 +16,7 @@ class AddPlaceScreen extends ConsumerStatefulWidget {
 }
 
 class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
+  PlaceLocation? _selectedLocation;
   final _formKey = GlobalKey<FormState>();
   String _title = '';
   File? _pickedImage;
@@ -27,60 +28,68 @@ class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
       appBar: AppBar(
         title: const Text("Add new place"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Form(
-          key: _formKey,
-          child: Column(children: [
-            TextFormField(
-              style:
-                  TextStyle(color: Theme.of(context).colorScheme.onBackground),
-              decoration: const InputDecoration(
-                label: Text('Title'),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Form(
+            key: _formKey,
+            child: Column(children: [
+              TextFormField(
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onBackground),
+                decoration: const InputDecoration(
+                  label: Text('Title'),
+                ),
+                validator: (value) {
+                  if (value == null ||
+                      value.isEmpty ||
+                      value.trim().length <= 1) {
+                    return 'please enter a title for the place';
+                  }
+                  return null;
+                },
+                onSaved: (value) => _title = value!,
               ),
-              validator: (value) {
-                if (value == null ||
-                    value.isEmpty ||
-                    value.trim().length <= 1) {
-                  return 'please enter a title for the place';
-                }
-                return null;
-              },
-              onSaved: (value) => _title = value!,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            ImageInput(onPickImage: (image) {
-              _pickedImage = image;
-            }),
-            const SizedBox(
-              height: 10,
-            ),
-            const LocationInput(),
-            const SizedBox(
-              height: 10,
-            ),
-            ElevatedButton.icon(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  _formKey.currentState!.save();
-                  if (_pickedImage == null) return;
-                  Place newPlace = Place(
-                    title: _title,
-                    image: _pickedImage!,
-                  );
-                  ref
-                      .read(favoritePlacesProvider.notifier)
-                      .addFavPlaces(newPlace);
+              const SizedBox(
+                height: 10,
+              ),
+              ImageInput(onPickImage: (image) {
+                _pickedImage = image;
+              }),
+              const SizedBox(
+                height: 10,
+              ),
+              LocationInput(
+                onSelectLocation: (latlng) {
+                  _selectedLocation = latlng;
+                },
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _formKey.currentState!.save();
+                    if (_pickedImage == null || _selectedLocation == null)
+                      return;
+                    Place newPlace = Place(
+                      title: _title,
+                      location: _selectedLocation!,
+                      image: _pickedImage!,
+                    );
+                    ref
+                        .read(favoritePlacesProvider.notifier)
+                        .addFavPlaces(newPlace);
 
-                  Navigator.of(context).pop();
-                }
-              },
-              icon: const Icon(Icons.add),
-              label: const Text('Add place'),
-            )
-          ]),
+                    Navigator.of(context).pop();
+                  }
+                },
+                icon: const Icon(Icons.add),
+                label: const Text('Add place'),
+              )
+            ]),
+          ),
         ),
       ),
     );

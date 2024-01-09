@@ -1,15 +1,21 @@
+import 'package:favorite_places_app/models/place_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 
 class LocationInput extends StatefulWidget {
-  const LocationInput({super.key});
+  LocationInput({super.key, required this.onSelectLocation});
+
+  void Function(PlaceLocation location) onSelectLocation;
 
   @override
   State<LocationInput> createState() => _LocationInputState();
 }
 
 class _LocationInputState extends State<LocationInput> {
-  Location? pickedLocation;
+  PlaceLocation? _pickedLocation;
+  var lat, long;
   var _isGettingLocation = false;
   void _getCurrentLocation() async {
     Location location = Location();
@@ -39,10 +45,17 @@ class _LocationInputState extends State<LocationInput> {
     });
 
     locationData = await location.getLocation();
+    lat = locationData.latitude;
+    long = locationData.longitude;
+
+    if (lat == null || long == null) return;
 
     setState(() {
+      _pickedLocation = PlaceLocation(latitude: lat, longitude: long);
       _isGettingLocation = false;
     });
+
+    widget.onSelectLocation(_pickedLocation!);
   }
 
   @override
@@ -56,6 +69,25 @@ class _LocationInputState extends State<LocationInput> {
     if (_isGettingLocation) {
       previewContent = const CircularProgressIndicator();
     }
+    if (lat != null) {
+      previewContent = FlutterMap(
+        options: MapOptions(initialCenter: LatLng(lat, long)),
+        children: [
+          TileLayer(
+            urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          ),
+          MarkerLayer(markers: [
+            Marker(
+                point: LatLng(lat, long),
+                child: const Icon(
+                  Icons.pin_drop,
+                  color: Colors.red,
+                ))
+          ])
+        ],
+      );
+    }
+
     return Column(
       children: [
         Container(
