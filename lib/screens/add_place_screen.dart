@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 
 import 'package:favorite_places_app/models/place_model.dart';
+import 'package:geocoding/geocoding.dart';
 
 class AddPlaceScreen extends ConsumerStatefulWidget {
   const AddPlaceScreen({super.key});
@@ -16,6 +17,7 @@ class AddPlaceScreen extends ConsumerStatefulWidget {
 }
 
 class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
+  String _address = '';
   PlaceLocation? _selectedLocation;
   final _formKey = GlobalKey<FormState>();
   String _title = '';
@@ -62,6 +64,20 @@ class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
               LocationInput(
                 onSelectLocation: (latlng) {
                   _selectedLocation = latlng;
+                  placemarkFromCoordinates(latlng.latitude, latlng.longitude)
+                      .then(
+                    (placemarks) {
+                      var output = 'No results found.';
+                      if (placemarks.isNotEmpty) {
+                        output = placemarks[0].street.toString() +
+                            ', ' +
+                            placemarks[0].administrativeArea.toString() +
+                            ', ' +
+                            placemarks[0].country.toString();
+                      }
+                      _address = output;
+                    },
+                  );
                 },
               ),
               const SizedBox(
@@ -73,8 +89,10 @@ class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
                     _formKey.currentState!.save();
                     if (_pickedImage == null || _selectedLocation == null)
                       return;
+
                     Place newPlace = Place(
                       title: _title,
+                      address: _address,
                       location: _selectedLocation!,
                       image: _pickedImage!,
                     );

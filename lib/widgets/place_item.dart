@@ -17,28 +17,6 @@ class PlaceItem extends StatefulWidget {
 }
 
 class _PlaceItemState extends State<PlaceItem> {
-  String _adresse = '';
-  @override
-  void initState() {
-    super.initState();
-    placemarkFromCoordinates(
-            widget.place.location.latitude, widget.place.location.longitude)
-        .then((placemarks) {
-      var output = 'No results found.';
-      if (placemarks.isNotEmpty) {
-        output = placemarks[0].street.toString() +
-            ', ' +
-            placemarks[0].administrativeArea.toString() +
-            ', ' +
-            placemarks[0].country.toString();
-        print(output);
-      }
-      setState(() {
-        _adresse = output;
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -46,7 +24,7 @@ class _PlaceItemState extends State<PlaceItem> {
           radius: 26, backgroundImage: FileImage(widget.place.image)),
       title: Text(widget.place.title),
       subtitle: Text(
-        _adresse,
+        widget.place.address,
         style: Theme.of(context)
             .textTheme
             .bodySmall!
