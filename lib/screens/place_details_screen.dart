@@ -1,4 +1,5 @@
 import 'package:favorite_places_app/models/place_model.dart';
+import 'package:favorite_places_app/screens/map_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -28,31 +29,43 @@ class PlaceDetailsScreen extends StatelessWidget {
               right: 0,
               child: Column(
                 children: [
-                  Container(
-                    clipBehavior: Clip.hardEdge,
-                    decoration: BoxDecoration(shape: BoxShape.circle),
-                    height: 200,
-                    width: 200,
-                    child: IgnorePointer(
-                      child: FlutterMap(
-                        options: MapOptions(
-                            initialCenter: LatLng(place.location.latitude,
-                                place.location.longitude)),
-                        children: [
-                          TileLayer(
-                            urlTemplate:
-                                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                          ),
-                          MarkerLayer(markers: [
-                            Marker(
-                                point: LatLng(place.location.latitude,
-                                    place.location.longitude),
-                                child: const Icon(
-                                  Icons.pin_drop,
-                                  color: Colors.red,
-                                ))
-                          ])
-                        ],
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) {
+                        return MapScreen(
+                          location: place.location,
+                          isSelecting: false,
+                        );
+                      }));
+                    },
+                    child: Container(
+                      clipBehavior: Clip.hardEdge,
+                      decoration: const BoxDecoration(shape: BoxShape.circle),
+                      height: 200,
+                      width: 200,
+                      child: IgnorePointer(
+                        child: FlutterMap(
+                          options: MapOptions(
+                              initialCenter: LatLng(place.location.latitude,
+                                  place.location.longitude)),
+                          children: [
+                            TileLayer(
+                              urlTemplate:
+                                  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                            ),
+                            MarkerLayer(markers: [
+                              Marker(
+                                  point: LatLng(place.location.latitude,
+                                      place.location.longitude),
+                                  child: const Icon(
+                                    Icons.location_on,
+                                    size: 36,
+                                    color: Colors.red,
+                                  ))
+                            ])
+                          ],
+                        ),
                       ),
                     ),
                   ),

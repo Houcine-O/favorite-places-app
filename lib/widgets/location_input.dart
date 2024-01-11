@@ -1,13 +1,14 @@
 import 'package:favorite_places_app/models/place_model.dart';
+import 'package:favorite_places_app/screens/map_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 
 class LocationInput extends StatefulWidget {
-  LocationInput({super.key, required this.onSelectLocation});
+  const LocationInput({super.key, required this.onSelectLocation});
 
-  void Function(PlaceLocation location) onSelectLocation;
+  final void Function(PlaceLocation location) onSelectLocation;
 
   @override
   State<LocationInput> createState() => _LocationInputState();
@@ -69,18 +70,22 @@ class _LocationInputState extends State<LocationInput> {
     if (_isGettingLocation) {
       previewContent = const CircularProgressIndicator();
     }
-    if (lat != null) {
+    if (_pickedLocation != null) {
       previewContent = FlutterMap(
-        options: MapOptions(initialCenter: LatLng(lat, long)),
+        options: MapOptions(
+          center: LatLng(_pickedLocation!.latitude, _pickedLocation!.longitude),
+        ),
         children: [
           TileLayer(
             urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
           ),
           MarkerLayer(markers: [
             Marker(
-                point: LatLng(lat, long),
+                point: LatLng(
+                    _pickedLocation!.latitude, _pickedLocation!.longitude),
                 child: const Icon(
-                  Icons.pin_drop,
+                  Icons.location_on,
+                  size: 36,
                   color: Colors.red,
                 ))
           ])
@@ -109,9 +114,28 @@ class _LocationInputState extends State<LocationInput> {
                 icon: const Icon(Icons.location_on),
                 label: const Text('Get current location')),
             TextButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.map),
-                label: const Text('Select on map'))
+              onPressed: () async {
+                final selectedLocation =
+                    await Navigator.of(context).push<LatLng>(
+                  MaterialPageRoute(builder: (context) {
+                    return MapScreen(
+                      isSelecting: true,
+                    );
+                  }),
+                );
+                if (selectedLocation == null) return;
+
+                setState(() {
+                  _pickedLocation = PlaceLocation(
+                      latitude: selectedLocation.latitude,
+                      longitude: selectedLocation.longitude);
+                  _isGettingLocation = false;
+                });
+                widget.onSelectLocation(_pickedLocation!);
+              },
+              icon: const Icon(Icons.map),
+              label: const Text('Select on map'),
+            ),
           ],
         )
       ],
