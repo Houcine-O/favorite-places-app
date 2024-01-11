@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:favorite_places_app/models/place_model.dart';
 import 'package:favorite_places_app/screens/map_screen.dart';
 import 'package:flutter/material.dart';
@@ -118,7 +120,7 @@ class _LocationInputState extends State<LocationInput> {
                 final selectedLocation =
                     await Navigator.of(context).push<LatLng>(
                   MaterialPageRoute(builder: (context) {
-                    return MapScreen(
+                    return const MapScreen(
                       isSelecting: true,
                     );
                   }),

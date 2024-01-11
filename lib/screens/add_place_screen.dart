@@ -87,8 +87,9 @@ class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
-                    if (_pickedImage == null || _selectedLocation == null)
+                    if (_pickedImage == null || _selectedLocation == null) {
                       return;
+                    }
 
                     Place newPlace = Place(
                       title: _title,

@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:favorite_places_app/models/place_model.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';

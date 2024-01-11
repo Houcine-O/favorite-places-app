@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart' as syspaths;
 import 'package:path/path.dart' as path;
@@ -23,22 +22,22 @@ Future<Database> _getDatabase() async {
 
 class FavoritePlacesNotifier extends StateNotifier<List<Place>> {
   FavoritePlacesNotifier() : super(const []);
-  void loadPlaces() async {
+
+  Future<void> loadPlaces() async {
     final db = await _getDatabase();
     final data = await db.query('fav_places');
-    final favPlaces = data
-        .map(
-          (row) => Place(
-              id: row['id'] as String,
-              title: row['title'] as String,
-              image: File(row['image'] as String),
-              location: PlaceLocation(
-                  latitude: row['lat'] as double,
-                  longitude: row['lng'] as double),
-              address: row['address'] as String),
-        )
-        .toList();
-    state = favPlaces;
+
+    final places = data.map((row) {
+      return Place(
+          id: row['id'] as String,
+          title: row['title'] as String,
+          image: File(row['image'] as String),
+          location: PlaceLocation(
+              latitude: row['lat'] as double, longitude: row['lng'] as double),
+          address: row['address'] == null ? ' ' : row['address'] as String);
+    }).toList();
+
+    state = places;
   }
 
   void addFavPlaces(Place place) async {
@@ -55,6 +54,7 @@ class FavoritePlacesNotifier extends StateNotifier<List<Place>> {
       'image': place.image.path,
       'lat': place.location.latitude,
       'lng': place.location.longitude,
+      'address': place.address,
     });
     state = [place, ...state];
   }
